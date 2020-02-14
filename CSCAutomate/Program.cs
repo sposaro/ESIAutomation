@@ -1,7 +1,5 @@
 ﻿using System;
-using System.Net.Http;
-using System.Text;
-using System.Web;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
 
@@ -9,37 +7,23 @@ namespace CSCAutomate
 {
     class Program
     {
-        private static readonly HttpClient client = new HttpClient();
-
         public static async Task Main(string[] args)
         {
-            string response = await CreateChallengeAsync(ContestTests.TestContest);
+            if (args.Length != 3)
+            {
+                Console.Out.WriteLine("Error Arg Count not 3. Expecting [ConnectionString, ContainerName, CloudApiKey]");
+                return;
+            }
 
-            Console.Out.WriteLine(response);
+            var blobApi = new BlobApi(args[0], args[1]);
+            var cscApi = new CloudSkillApi(args[2]);
 
-            Console.In.Read();
-        }
+            List<ContestResponse> contestReponseList = await cscApi.CreateCollectionChallengesAsync(ContestFactory.Collections, ContestFactory.Default);
 
-        public static async Task<string> CreateChallengeAsync(Contest contest)
-        {
-            var queryString = HttpUtility.ParseQueryString(string.Empty);
+            string json = JsonConvert.SerializeObject(contestReponseList);
+            string fileName = $"{DateTime.Now.ToString("MMMM")}{Guid.NewGuid().ToString()}";
 
-            string API_KEY = "<Omitted>";
-            string uri = "<Omitted>" + queryString;
-            HttpResponseMessage response;
-
-            // Request headers
-            client.DefaultRequestHeaders.Add("Ocp-Apim-Subscription-Key", API_KEY);
-
-            // Request body
-            string json = JsonConvert.SerializeObject(contest);
-
-            // Make Call
-            var responseData = await client.PostAsync(
-                                        uri,
-                                        new StringContent(json, Encoding.UTF8, "application/json"));
-
-            return "called";
+            await blobApi.UploadToBlobAsync(json, fileName);
         }
     }
 }
