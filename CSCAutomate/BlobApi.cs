@@ -1,4 +1,8 @@
 ﻿using Azure.Storage.Blobs;
+using Azure.Storage.Blobs.Models;
+using Newtonsoft.Json;
+using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
 
@@ -34,6 +38,45 @@ namespace CSCAutomate
             using FileStream uploadFileStream = File.OpenRead(localFilePath);
             await blobClient.UploadAsync(uploadFileStream);
             uploadFileStream.Close();
+        }
+
+        public async Task<T> GetBlobContentsAync<T>(string blobname)
+        {
+            BlobClient blobClient = containerClient.GetBlobClient(blobname);
+            BlobDownloadInfo blobDownload = await blobClient.DownloadAsync();
+            T result;
+
+            using (var stream = new MemoryStream())
+            {
+                await blobDownload.Content.CopyToAsync(stream);
+                stream.Position = 0;
+                result = DeserializeFromStream<T>(stream);
+            }
+            return result;
+        }
+
+        private T DeserializeFromStream<T>(Stream stream)
+        {
+            var serializer = new JsonSerializer();
+
+            using (var sr = new StreamReader(stream))
+            using (var jsonTextReader = new JsonTextReader(sr))
+            {
+                return serializer.Deserialize<T>(jsonTextReader);
+            }
+        }
+
+        public async Task<List<BlobItem>> GetBlobItems(string prefix = "")   
+        {
+            var results = new List<BlobItem>();
+
+            // List all blobs in the container
+            await foreach (BlobItem blobItem in containerClient.GetBlobsAsync(prefix: prefix))
+            {
+                results.Add(blobItem);
+            }
+
+            return results;
         }
     }
 }
