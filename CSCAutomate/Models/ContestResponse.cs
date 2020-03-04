@@ -1,54 +1,55 @@
-﻿using System;
+﻿using CSCAutomate.Models;
+using System;
 using System.Collections.Generic;
 
 namespace CSCAutomate
 {
     public class ContestResponse
     {
-        public List<object> learners { get; set; }
-        public ContestCollection contestCollection { get; set; }
-        public DateTime adjustedStartDate { get; set; }
-        public DateTime adjustedEndDate { get; set; }
-        public DateTime adjustedNextProgressUpdateOn { get; set; }
-        public int growth { get; set; }
-        public string id { get; set; }
-        public string contestId { get; set; }
-        public string name { get; set; }
-        public object description { get; set; }
-        public string challengeDescription { get; set; }
-        public bool hasPrizes { get; set; }
-        public object prizes { get; set; }
-        public string type { get; set; }
-        public string status { get; set; }
-        public DateTime startDate { get; set; }
-        public string startDateStr { get; set; }
-        public DateTime endDate { get; set; }
-        public string endDateStr { get; set; }
-        public object targetValue { get; set; }
-        public int numberOfLearners { get; set; }
-        public string customCss { get; set; }
-        public string templateSelection { get; set; }
-        public bool selfRegistrationEnabled { get; set; }
-        public DateTime createdOn { get; set; }
-        public string createdBy { get; set; }
-        public object createdByEmail { get; set; }
-        public string microsoftAccountSponsor { get; set; }
-        public string country { get; set; }
-        public string mstpid { get; set; }
-        public string eou { get; set; }
-        public string accountType { get; set; }
-        public object lastProgressUpdateOn { get; set; }
-        public DateTime nextProgressUpdateOn { get; set; }
-        public int progressUpdateInterval { get; set; }
-        public string timeZone { get; set; }
-        public object groupName { get; set; }
-        public bool allowTeams { get; set; }
-        public string teams { get; set; }
-        public object mpnid { get; set; }
-        public string participantType { get; set; }
-        public object collectionID { get; set; }
-        public bool showModuleCompletionDate { get; set; }
-        public object collectionName { get; set; }
-        public object collectionUrl { get; set; }
+        public List<Learner> Learners { get; set; }
+        public ContestCollection ContestCollection { get; set; }
+        public DateTime? AdjustedStartDate { get; set; }
+        public DateTime? AdjustedEndDate { get; set; }
+        public DateTime AdjustedNextProgressUpdateOn { get; set; }
+        public int Growth { get; set; }
+        public string Id { get; set; }
+        public string ContestId { get; set; }
+        public string Name { get; set; }
+        public object Description { get; set; }
+        public string ChallengeDescription { get; set; }
+        public bool HasPrizes { get; set; }
+        public object Prizes { get; set; }
+        public string Type { get; set; }
+        public string Status { get; set; }
+        public DateTime? StartDate { get; set; }
+        public string StartDateStr { get; set; }
+        public DateTime? EndDate { get; set; }
+        public string EndDateStr { get; set; }
+        public object TargetValue { get; set; }
+        public int NumberOfLearners { get; set; }
+        public string CustomCss { get; set; }
+        public string TemplateSelection { get; set; }
+        public bool SelfRegistrationEnabled { get; set; }
+        public DateTime CreatedOn { get; set; }
+        public string CreatedBy { get; set; }
+        public object CreatedByEmail { get; set; }
+        public string MicrosoftAccountSponsor { get; set; }
+        public string Country { get; set; }
+        public string Mstpid { get; set; }
+        public string Eou { get; set; }
+        public string AccountType { get; set; }
+        public object LastProgressUpdateOn { get; set; }
+        public DateTime NextProgressUpdateOn { get; set; }
+        public int ProgressUpdateInterval { get; set; }
+        public string TimeZone { get; set; }
+        public object GroupName { get; set; }
+        public bool AllowTeams { get; set; }
+        public string Teams { get; set; }
+        public object Mpnid { get; set; }
+        public string ParticipantType { get; set; }
+        public object CollectionID { get; set; }
+        public bool ShowModuleCompletionDate { get; set; }
+        public object CollectionName { get; set; }
+        public object CollectionUrl { get; set; }
     }
 }

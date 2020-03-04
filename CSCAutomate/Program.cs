@@ -21,6 +21,7 @@ namespace CSCAutomate
             var blobApi = new BlobApi(args[0], args[1]);
             var cscApi = new CloudSkillApi(args[2]);
 
+            //await cscApi.GetContestStatus("5ae66917-5e08-4dfe-adca-c2b147731864");
             //await CreateChallengesAsyc(blobApi, cscApi);
             //await GetCurrentContestAsync(blobApi, cscApi);
 

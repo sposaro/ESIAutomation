@@ -1,14 +1,13 @@
-﻿using System;
+﻿using CSCAutomate.Models;
 using System.Collections.Generic;
-using System.Text;
 
 namespace CSCAutomate
 {
     public class ContestCollection
     {
-        public string id { get; set; }
-        public string contestId { get; set; }
-        public object collectionID { get; set; }
-        public List<object> contestCollectionModulesList { get; set; }
+        public string Id { get; set; }
+        public string ContestId { get; set; }
+        public string CollectionID { get; set; }
+        public List<CollectionModule> ContestCollectionModulesList { get; set; }
     }
 }
