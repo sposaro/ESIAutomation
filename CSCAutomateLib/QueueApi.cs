@@ -25,6 +25,14 @@ namespace CSCAutomateLib
             //return await queueClient.SendMessageAsync(queueMessageBase64Encoded);
             return await queueClient.SendMessageAsync(queueMessage);
         }
+
+        public async Task<Azure.Response<QueueMessage[]>> ReceiveQueueMessageAync()
+        {
+
+            return await queueClient.ReceiveMessagesAsync();
+        }
+
+
         #endregion
     }
 }
