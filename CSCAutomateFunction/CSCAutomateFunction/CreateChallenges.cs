@@ -1,26 +1,52 @@
 ﻿using CSCAutomateLib;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.WebJobs;
+using Microsoft.Azure.WebJobs.Extensions.Http;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using System;
+using System.IO;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
+
 namespace CSCAutomateFunction
 {
-    public static class CreateChallengesFromQueue
+    public static class CreateChallenges
     {
         #region "Public Methods"
         [FunctionName("CreateChallengesFromQueue")]
-        public static async Task Run([QueueTrigger("stq-cloudskillschallenge1")]string myQueueItem, ILogger log)
+        public static async Task Run(
+            [QueueTrigger("stq-cloudskillschallenge1")]string myQueueItem, 
+            ILogger log)
         {
             try
             {
-                await CreateChallenge(myQueueItem, log);
+                await CreateChallengesAsync(myQueueItem, log);
             }
             catch (Exception ex)
             {
-                log.LogError(string.Format("Error in CreateChallengesFunction: {0}", ex.Message));
+                log.LogError(string.Format("Error in CreateChallenges: {0}", ex.Message));
+                throw;
+            }
+        }
+
+        [FunctionName("CreateChallengesFromHttp")]
+        public static async Task<IActionResult> Run(
+            [HttpTrigger(AuthorizationLevel.Function, "get", "post", Route = null)] HttpRequest req,
+            ILogger log)
+        {
+            try
+            {
+                string requestBody = await new StreamReader(req.Body).ReadToEndAsync();
+                await CreateChallengesAsync(requestBody, log);
+                string responseMessage = "This HTTP triggered function executed successfully.";
+                return new OkObjectResult(responseMessage);
+            }
+            catch (Exception ex)
+            {
+                log.LogError(string.Format("Error in CreateChallenges: {0}", ex.Message));
                 throw;
             }
         }
@@ -28,9 +54,9 @@ namespace CSCAutomateFunction
 
         #region "Private Methods"
 
-        static async Task CreateChallenge([QueueTrigger("stq-cloudskillschallenge1")]string myQueueItem, ILogger log)
+        static async Task CreateChallengesAsync([QueueTrigger("stq-cloudskillschallenge1")]string myQueueItem, ILogger log)
         {
-            log.LogInformation($"C# Queue trigger function processing async: {myQueueItem}");
+            log.LogInformation($"C# CreateChallenges function processing async: {myQueueItem}");
             string jsonMessage = Regex.Unescape(myQueueItem);
             string doubleQuote = "\"";
             jsonMessage = jsonMessage.Remove(jsonMessage.IndexOf(doubleQuote), doubleQuote.Length);
