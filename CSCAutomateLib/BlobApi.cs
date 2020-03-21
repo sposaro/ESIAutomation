@@ -3,6 +3,7 @@ using Azure.Storage.Blobs.Models;
 using Newtonsoft.Json;
 using System.Collections.Generic;
 using System.IO;
+using System.Text;
 using System.Threading.Tasks;
 
 namespace CSCAutomateLib
@@ -28,20 +29,20 @@ namespace CSCAutomateLib
         #endregion
 
         #region "Public Methods"
-        public async Task UploadToBlobAsync(string json, string blobName, string localFilePath = "./temp.json")
+        public async Task UploadToBlobAsync(string json, string blobName)
         {
             await containerClient.CreateIfNotExistsAsync();
-
-            // Write text to the file
-            File.WriteAllText(localFilePath, json);
 
             // Get a reference to a blob
             BlobClient blobClient = containerClient.GetBlobClient($"{blobName}.json");
 
-            // Open the file and upload its data
-            FileStream uploadFileStream = File.OpenRead(localFilePath);
-            await blobClient.UploadAsync(uploadFileStream);
-            uploadFileStream.Close();
+            // convert string to stream
+            byte[] byteArray = Encoding.UTF8.GetBytes(json);
+            //byte[] byteArray = Encoding.ASCII.GetBytes(contents);
+            MemoryStream stream = new MemoryStream(byteArray);
+
+            await blobClient.UploadAsync(stream);
+
         }
 
         public async Task<T> GetBlobContentsAync<T>(string blobname)

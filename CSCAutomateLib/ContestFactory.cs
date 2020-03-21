@@ -49,7 +49,7 @@ namespace CSCAutomateLib
         {
             StringBuilder sb = new StringBuilder();
             DateTime dt = DateTime.Now;
-            
+
             sb.Append("[{\"additionalInputs\":[{\"autoRecurring\":true,\"requestedVouchers\":true}],\"baseInputs\":[{\"EndDateStr\":\"");
             sb.Append(string.Format("{0:MM-dd-yyyy hh:mm:ss}", dt.AddMonths(1)));
             sb.Append("\",\"StartDateStr\":\"");
@@ -62,7 +62,7 @@ namespace CSCAutomateLib
 
             return sb.ToString();
 
-            //return "[{\"additionalInputs\":[{\"autoRecurring\":true,\"requestedVouchers\":true}],\"baseInputs\":[{\"EndDateStr\":\"03-30-2020 23:59:59\",\"StartDateStr\":\"03-15-2020 00:00:01\",\"accountType\":\"Strategic Commercial\",\"allowTeams\":\"true\",\"challengeDescription\":\"Cloud Skills Challenge 2\",\"collectionUrl\":\"null\",\"country\":\"United States\",\"createdby\":\"srambati\",\"customCSS\":\"null\",\"eou\":\"null\",\"hasPrizes\":\"false\",\"microsoftAccountSponsor\":\"srambati\",\"mpnid\":\"null\",\"mstpid\":\"645147\",\"name\":\"UTC 129\",\"participantType\":\"Customer\",\"selfRegistrationEnabled\":\"true\",\"teams\":\"Team1,Team2\",\"templateSelection\":\"theme0\",\"timeZone\":\"null\",\"type\":\"Growth\"}],\"learningPaths\":[{\"collectionName\":\"AZ-900\",\"collectionUrl\":\"https://docs.microsoft.com/en-us/learn/paths/azure-fundamentals\"},{\"collectionName\":\"AZ-103\",\"collectionUrl\":\"https://docs.microsoft.com/en-us/users/drfrank/collections/704b82r0m6zn0\"},{\"collectionName\":\"AZ-120\",\"collectionUrl\":\"Needs Collection URL\"},{\"collectionName\":\"AZ-203\",\"collectionUrl\":\"Needs Collection URL\"},{\"collectionName\":\"AZ-220\",\"collectionUrl\":\"Needs Collection URL\"},{\"collectionName\":\"AZ-300/301\",\"collectionUrl\":\"Needs Collection URL\"},{\"collectionName\":\"AI-100\",\"collectionUrl\":\"Needs Collection URL\"},{\"collectionName\":\"DP-100\",\"collectionUrl\":\"Needs Collection URL\"},{\"collectionName\":\"AI-100\",\"collectionUrl\":\"Needs Collection URL\"},{\"collectionName\":\"DP-100\",\"collectionUrl\":\"Needs Collection URL\"},{\"collectionName\":\"DP-200/201\",\"collectionUrl\":\"Needs Collection URL\"},{\"collectionName\":\"AZ-400\",\"collectionUrl\":\"Needs Collection URL\"},{\"collectionName\":\"AZ-500\",\"collectionUrl\":\"Needs Collection URL\"}]}]";
+            //return "[{\"additionalInputs\":[{\"autoRecurring\":true,\"requestedVouchers\":true}],\"baseInputs\":[{\"EndDateStr\":\"03-17-2020 23:59:59\",\"StartDateStr\":\"03-17-2020 00:00:00\",\"accountType\":\"Customer\",\"allowTeams\":\"false\",\"challengeDescription\":\"Cloud Skills Challenge\",\"collectionUrl\":\"null\",\"country\":\"United States\",\"createdby\":\"srambati\",\"customCSS\":\"null\",\"eou\":\"null\",\"hasPrizes\":\"false\",\"microsoftAccountSponsor\":\"srambati\",\"mpnid\":\"null\",\"mstpid\":\"645147\",\"name\":\"UTC Challenge 006\",\"participantType\":\"Customer\",\"selfRegistrationEnabled\":\"true\",\"teams\":\"null\",\"templateSelection\":\"theme0\",\"timeZone\":\"null\",\"type\":\"Growth\"}],\"learningPaths\":[{\"collectionName\":\"AZ-103\",\"collectionUrl\":\"https://docs.microsoft.com/en-us/users/drfrank/collections/704b82r0m6zn0\"},{\"collectionName\":\"AZ-900\",\"collectionUrl\":\"https://docs.microsoft.com/en-us/learn/paths/azure-fundamentals/\"}]}]";
         }
         public static List<ChallengeRequest> CreateChallengeRequest(string jsonChallengeRequest)
         {
