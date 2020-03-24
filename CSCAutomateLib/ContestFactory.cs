@@ -64,9 +64,9 @@ namespace CSCAutomateLib
 
             //return "[{\"additionalInputs\":[{\"autoRecurring\":true,\"requestedVouchers\":true}],\"baseInputs\":[{\"EndDateStr\":\"03-17-2020 23:59:59\",\"StartDateStr\":\"03-17-2020 00:00:00\",\"accountType\":\"Customer\",\"allowTeams\":\"false\",\"challengeDescription\":\"Cloud Skills Challenge\",\"collectionUrl\":\"null\",\"country\":\"United States\",\"createdby\":\"srambati\",\"customCSS\":\"null\",\"eou\":\"null\",\"hasPrizes\":\"false\",\"microsoftAccountSponsor\":\"srambati\",\"mpnid\":\"null\",\"mstpid\":\"645147\",\"name\":\"UTC Challenge 006\",\"participantType\":\"Customer\",\"selfRegistrationEnabled\":\"true\",\"teams\":\"null\",\"templateSelection\":\"theme0\",\"timeZone\":\"null\",\"type\":\"Growth\"}],\"learningPaths\":[{\"collectionName\":\"AZ-103\",\"collectionUrl\":\"https://docs.microsoft.com/en-us/users/drfrank/collections/704b82r0m6zn0\"},{\"collectionName\":\"AZ-900\",\"collectionUrl\":\"https://docs.microsoft.com/en-us/learn/paths/azure-fundamentals/\"}]}]";
         }
-        public static List<ChallengeRequest> CreateChallengeRequest(string jsonChallengeRequest)
+        public static ChallengeRequest CreateChallengeRequest(string jsonChallengeRequest)
         {
-            var result = JsonConvert.DeserializeObject<List<ChallengeRequest>>(jsonChallengeRequest);
+            var result = JsonConvert.DeserializeObject<ChallengeRequest>(jsonChallengeRequest);
 
             return result;
         }

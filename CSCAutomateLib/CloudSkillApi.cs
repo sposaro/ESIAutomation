@@ -53,14 +53,14 @@ namespace CSCAutomateLib
         /// <returns></returns>
         public async Task<List<ContestResponse>> CreateChallengesAsyc(BlobApi blobApi, string challengeRequestJson)
         {
-            List<ChallengeRequest> challengeRequest = ContestFactory.CreateChallengeRequest(challengeRequestJson);
+            ChallengeRequest challengeRequest = ContestFactory.CreateChallengeRequest(challengeRequestJson);
             List<ContestResponse> contestReponseList = await CreateCollectionChallengesAsync(
-                challengeRequest[0].LearningPaths,
-                challengeRequest[0].BaseInputs[0]);
+                challengeRequest.LearningPaths,
+                challengeRequest.BaseInputs[0]);
 
             string json = JsonConvert.SerializeObject(contestReponseList);
             string fileName = $"{ContestPrefix}{DateTime.Now.ToString(DateFormat)}_{Guid.NewGuid().ToString()}";
-            await blobApi.UploadToBlobAsync(json, fileName);
+            await blobApi?.UploadToBlobAsync(json, fileName);
 
             return contestReponseList;
         }
