@@ -17,7 +17,7 @@ namespace CSCAutomateFunction
     {
         #region "Public Methods"
         [FunctionName("CreateChallengesFromQueue")]
-        public static async Task Run(
+        public static async Task RunQueue(
             [QueueTrigger("stq-cloudskillschallenge1")]string myQueueItem, 
             ILogger log)
         {
@@ -33,7 +33,7 @@ namespace CSCAutomateFunction
         }
 
         [FunctionName("CreateChallengesFromHttp")]
-        public static async Task<IActionResult> Run(
+        public static async Task<IActionResult> RunHttp(
             [HttpTrigger(AuthorizationLevel.Function, "get", "post", Route = null)] HttpRequest req,
             ILogger log)
         {
