@@ -4,12 +4,6 @@ using System.Text;
 
 namespace CSCAutomateLib
 {
-    public class AdditionalInput
-    {
-        public bool AutoRecurring { get; set; }
-        public bool RequestedVouchers { get; set; }
-    }
-
     public class LearningPath
     {
         public string CollectionName { get; set; }
@@ -23,7 +17,7 @@ namespace CSCAutomateLib
 
     public class ChallengeRequest
     {
-        public IList<AdditionalInput> AdditionalInputs { get; set; }
+        public string SponsorEmail { get; set; }
         public IList<ContestRequest> BaseInputs { get; set; }
         public IList<LearningPath> LearningPaths { get; set; }
     }
