@@ -28,6 +28,7 @@ namespace CSCAutomateLib
         private const string Https = "https";
         private const string DateFormat = "MMMDDYYYY";
         private const string ApiKeyName = "Ocp-Apim-Subscription-Key";
+        private const string ContestNameTag = "| Exam";
         #endregion
 
         #region "Constructor"
@@ -120,6 +121,7 @@ namespace CSCAutomateLib
         public async Task<List<ContestResponse>> CreateCollectionChallengesAsync(IList<LearningPath> learningPaths, ContestRequest request)
         {
             var results = new List<ContestResponse>();
+            request.Name = $"{request.Name} {ContestNameTag}";
 
             foreach (LearningPath lp in learningPaths)
             {
