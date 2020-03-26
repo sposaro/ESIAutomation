@@ -11,10 +11,10 @@ using System.Threading.Tasks;
 
 namespace CSCAutomateFunction
 {
-    public static class CreateChallenges
+    public static class AddLearner
     {
         #region "Public Methods"
-        [FunctionName("CreateChallengesFromHttp")]
+        [FunctionName("AddLearnerToChallengeFromHttp")]
         public static async Task<IActionResult> RunHttp(
             [HttpTrigger(AuthorizationLevel.Function, "get", "post", Route = null)] HttpRequest req,
             ILogger log)
@@ -30,13 +30,13 @@ namespace CSCAutomateFunction
                     return new BadRequestObjectResult(warningMessage);
                 }
 
-                await CreateChallengesAsync(requestBody, log);
+                await AddLearnerToChallengeAsync(requestBody, log);
 
                 return new OkObjectResult(requestBody);
             }
             catch (Exception ex)
             {
-                log.LogError(string.Format("Error in CreateChallengesFromHttp: {0}", ex.Message));
+                log.LogError(string.Format("Error in AddLearnerToChallengeFromHttp: {0}", ex.Message));
                 throw;
             }
         }
@@ -44,19 +44,18 @@ namespace CSCAutomateFunction
 
         #region "Private Methods"
 
-        private static async Task CreateChallengesAsync(string challengeRequestjson, ILogger log)
+        private static async Task AddLearnerToChallengeAsync(string learnerRequestJson, ILogger log)
         {
-            log.LogInformation($"C# CreateChallenges function processing async: {challengeRequestjson}");
+            log.LogInformation($"C# CreateLearner function processing async: {learnerRequestJson}");
             string environmentType = Environment.GetEnvironmentVariable("CSCAutomateEnvironment", EnvironmentVariableTarget.Process);
             string keyVaultName = Environment.GetEnvironmentVariable("CSCApiKeyVaultName", EnvironmentVariableTarget.Process);
 
             Configuration config = await ConfigurationFactory.CreateConfigurationAsync(environmentType, keyVaultName);
-            BlobApi blobApi = new BlobApi(config);
             CloudSkillApi cscApi = new CloudSkillApi(config);
 
-            await cscApi.CreateChallengesAsync(blobApi, challengeRequestjson);
+            string learnerReponse = await cscApi.AddLearnerAsync(learnerRequestJson);
 
-            log.LogInformation($"C# CreateChallenges function processed");
+            log.LogInformation($"C# CreateLearner function processed: {learnerReponse}");
         }
 
         #endregion

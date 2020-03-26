@@ -44,15 +44,14 @@ namespace CSCAutomateLib
         }
         #endregion
 
-
         #region "Public Methonds"
         /// <summary>
-        /// 
+        /// CreateChallengesAsync
         /// </summary>
         /// <param name="blobApi"></param>
         /// <param name="challengeRequestJson"></param>
         /// <returns></returns>
-        public async Task<List<ContestResponse>> CreateChallengesAsyc(BlobApi blobApi, string challengeRequestJson)
+        public async Task<List<ContestResponse>> CreateChallengesAsync(BlobApi blobApi, string challengeRequestJson)
         {
             ChallengeRequest challengeRequest = ContestFactory.CreateChallengeRequest(challengeRequestJson);
             List<ContestResponse> contestReponseList = await CreateCollectionChallengesAsync(
@@ -83,12 +82,12 @@ namespace CSCAutomateLib
         /// <summary>
         /// This method adds a learner to a contest.
         /// </summary>
-        /// <param name="contestId">The ContestId to add to.</param>
-        /// <param name="learnId">The MSLearn username to add to the contest</param>
+        /// <param name="learnerRequestJson">Request Body</param>
         /// <returns>The result from the server.</returns>
-        public async Task<string> AddLearner(string contestId, string learnId)
+        public async Task<string> AddLearnerAsync(string learnerRequestJson)
         {
-            string uri = string.Concat(apiRoot, ApiPathContests, contestId, ApiMethodLearners, learnId);
+            LearnerRequest request = JsonConvert.DeserializeObject<LearnerRequest>(learnerRequestJson);
+            string uri = string.Concat(apiRoot, ApiPathContests, request.ContestId, ApiMethodLearners, request.LearnerId);
             var response = await httpClient.PostAsync(uri,
                 new StringContent(string.Empty, Encoding.UTF8, MediaTypeJson));
             string result = await response.Content.ReadAsStringAsync();
