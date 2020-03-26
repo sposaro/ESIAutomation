@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace CSCAutomateLib
@@ -19,6 +17,14 @@ namespace CSCAutomateLib
         #endregion
 
         #region "Public Methods"
+        public static async Task<Configuration> CreateDevConfigurationAysnc()
+        {
+            string environmentType = Environment.GetEnvironmentVariable("CSCAutomateEnvironment", EnvironmentVariableTarget.Process);
+            string keyVaultName = Environment.GetEnvironmentVariable("CSCApiKeyVaultName", EnvironmentVariableTarget.Process);
+
+            return await ConfigurationFactory.CreateConfigurationAsync(environmentType, keyVaultName);
+        }
+
         public static async Task<Configuration> CreateConfigurationAsync(string environmentType, string keyVaultName)
         {
 

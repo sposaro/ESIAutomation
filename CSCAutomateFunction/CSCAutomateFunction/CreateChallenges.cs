@@ -4,8 +4,11 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Extensions.Http;
 using Microsoft.Extensions.Logging;
+using Newtonsoft.Json;
 using System;
+using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
 
 
@@ -13,6 +16,8 @@ namespace CSCAutomateFunction
 {
     public static class CreateChallenges
     {
+        private const string DateFormat = "MMMDDYYYY";
+
         #region "Public Methods"
         [FunctionName("CreateChallengesFromHttp")]
         public static async Task<IActionResult> RunHttp(
@@ -30,7 +35,7 @@ namespace CSCAutomateFunction
                     return new BadRequestObjectResult(warningMessage);
                 }
 
-                await CreateChallengesAsync(requestBody, log);
+                await CreateAndSaveChallengesAsync(requestBody, log);
 
                 return new OkObjectResult(requestBody);
             }
@@ -43,20 +48,26 @@ namespace CSCAutomateFunction
         #endregion
 
         #region "Private Methods"
-
-        private static async Task CreateChallengesAsync(string challengeRequestjson, ILogger log)
+        private static async Task CreateAndSaveChallengesAsync(string json, ILogger challengeRequestJson)
         {
-            log.LogInformation($"C# CreateChallenges function processing async: {challengeRequestjson}");
-            string environmentType = Environment.GetEnvironmentVariable("CSCAutomateEnvironment", EnvironmentVariableTarget.Process);
-            string keyVaultName = Environment.GetEnvironmentVariable("CSCApiKeyVaultName", EnvironmentVariableTarget.Process);
+            challengeRequestJson.LogInformation($"C# CreateChallenges function processing async: {json}");
+            BlobApi blobApi = await BlobApi.BlobApiInstance;
+            CloudSkillApi cscApi = await CloudSkillApi.CloudSkillsApiInstance;
 
-            Configuration config = await ConfigurationFactory.CreateConfigurationAsync(environmentType, keyVaultName);
-            BlobApi blobApi = new BlobApi(config);
-            CloudSkillApi cscApi = new CloudSkillApi(config);
+            // Creates the challenges
+            List<ContestResponse> response = await cscApi.CreateChallengesAsyc(json);
 
-            await cscApi.CreateChallengesAsync(blobApi, challengeRequestjson);
+            challengeRequestJson.LogInformation($"Created the Challenges. Saving response to blob");
 
-            log.LogInformation($"C# CreateChallenges function processed");
+            // Uses the tpid as the prefix for the blobs filename
+            string blobPrefix = response.First<ContestResponse>().Mstpid;
+
+            // Writes the blob to storage
+            string jsonString = JsonConvert.SerializeObject(response);
+            string fileName = $"{blobPrefix}{DateTime.Now.ToString(DateFormat)}_{Guid.NewGuid().ToString()}";
+            await blobApi.UploadToBlobAsync(jsonString, fileName);
+
+            challengeRequestJson.LogInformation($"C# CreateChallenges function processed");
         }
 
         #endregion

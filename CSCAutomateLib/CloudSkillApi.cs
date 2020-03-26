@@ -24,14 +24,15 @@ namespace CSCAutomateLib
         private const string ApiPathContests = "/api/contests/";
         private const string ApiMethodLearners = "/learners/";
         private const string MediaTypeJson = "application/json";
-        private const string ContestPrefix = "CurrentContest_";
         private const string Https = "https";
-        private const string DateFormat = "MMMDDYYYY";
         private const string ApiKeyName = "Ocp-Apim-Subscription-Key";
         private const string ContestNameTag = "| Exam";
         #endregion
 
         #region "Constructor"
+        public static AsyncLazy<CloudSkillApi> CloudSkillsApiInstance = new AsyncLazy<CloudSkillApi>(async () =>
+            new CloudSkillApi(await ConfigurationFactory.CreateDevConfigurationAysnc()));
+
         public CloudSkillApi(Configuration config)
         {
             if (string.IsNullOrEmpty(config.ApiKey.Trim()))
@@ -48,19 +49,14 @@ namespace CSCAutomateLib
         /// <summary>
         /// CreateChallengesAsync
         /// </summary>
-        /// <param name="blobApi"></param>
         /// <param name="challengeRequestJson"></param>
         /// <returns></returns>
-        public async Task<List<ContestResponse>> CreateChallengesAsync(BlobApi blobApi, string challengeRequestJson)
+        public async Task<List<ContestResponse>> CreateChallengesAsyc(string challengeRequestJson)
         {
             ChallengeRequest challengeRequest = ContestFactory.CreateChallengeRequest(challengeRequestJson);
             List<ContestResponse> contestReponseList = await CreateCollectionChallengesAsync(
                 challengeRequest.LearningPaths,
                 challengeRequest.BaseInputs[0]);
-
-            string json = JsonConvert.SerializeObject(contestReponseList);
-            string fileName = $"{ContestPrefix}{DateTime.Now.ToString(DateFormat)}_{Guid.NewGuid().ToString()}";
-            await blobApi?.UploadToBlobAsync(json, fileName);
 
             return contestReponseList;
         }
@@ -82,33 +78,15 @@ namespace CSCAutomateLib
         /// <summary>
         /// This method adds a learner to a contest.
         /// </summary>
-        /// <param name="learnerRequestJson">Request Body</param>
+        /// <param name="request">Request Body</param>
         /// <returns>The result from the server.</returns>
-        public async Task<string> AddLearnerAsync(string learnerRequestJson)
+        public async Task<string> AddLearnerAsync(string contestId, string learnerId)
         {
-            LearnerRequest request = JsonConvert.DeserializeObject<LearnerRequest>(learnerRequestJson);
-            string uri = string.Concat(apiRoot, ApiPathContests, request.ContestId, ApiMethodLearners, request.LearnerId);
+            string uri = string.Concat(apiRoot, ApiPathContests, contestId, ApiMethodLearners, learnerId);
             var response = await httpClient.PostAsync(uri,
                 new StringContent(string.Empty, Encoding.UTF8, MediaTypeJson));
             string result = await response.Content.ReadAsStringAsync();
             return result;
-        }
-
-        /// <summary>
-        /// Gets current contests from Blob Storage
-        /// </summary>
-        /// <param name="blobApi"></param>
-        /// <returns></returns>
-        public static async Task<List<ContestResponse>> GetCurrentContestAsync(BlobApi blobApi)
-        {
-            List<BlobItem> blobs = blobApi.GetBlobItems(ContestPrefix);
-
-            if (blobs.Count == 0)
-                return null;
-
-            string blobName = blobs[0].Name;
-
-            return await blobApi.GetBlobContentsAync<List<ContestResponse>>(blobName);
         }
 
         /// <summary>

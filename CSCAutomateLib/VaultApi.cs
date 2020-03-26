@@ -15,6 +15,8 @@ namespace CSCAutomateLib
         public VaultApi(string keyVaultName)
         {
             string kvUri = string.Format("https://{0}.vault.azure.net", keyVaultName);
+
+            // TODO: Should cache SecertClient
             secretClient = new SecretClient(new Uri(kvUri), new DefaultAzureCredential());
         }
 
