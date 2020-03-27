@@ -16,12 +16,10 @@ namespace CSCAutomateFunction
 {
     public static class CreateChallenges
     {
-        private const string DateFormat = "MMMDDYYYY";
-
         #region "Public Methods"
         [FunctionName("CreateChallengesFromHttp")]
         public static async Task<IActionResult> RunHttp(
-            [HttpTrigger(AuthorizationLevel.Function, "get", "post", Route = null)] HttpRequest req,
+            [HttpTrigger(AuthorizationLevel.Function, "post", Route = null)] HttpRequest req,
             ILogger log)
         {
             try
@@ -42,32 +40,38 @@ namespace CSCAutomateFunction
             catch (Exception ex)
             {
                 log.LogError(string.Format("Error in CreateChallengesFromHttp: {0}", ex.Message));
-                throw;
+                return new BadRequestObjectResult($"Error creating challenge. {ex.Message}");
             }
         }
         #endregion
 
         #region "Private Methods"
-        private static async Task CreateAndSaveChallengesAsync(string json, ILogger challengeRequestJson)
+        private static async Task CreateAndSaveChallengesAsync(string json, ILogger logger)
         {
-            challengeRequestJson.LogInformation($"C# CreateChallenges function processing async: {json}");
+            logger.LogInformation($"C# CreateChallenges function processing async: {json}");
+
+            ChallengeRequest challengeRequest = ContestFactory.CreateChallengeRequest(json);
+
+            if (challengeRequest == null)
+                throw new ArgumentException("Error parsing challenge request JSON");
+
             BlobApi blobApi = await BlobApi.BlobApiInstance;
             CloudSkillApi cscApi = await CloudSkillApi.CloudSkillsApiInstance;
 
             // Creates the challenges
-            List<ContestResponse> response = await cscApi.CreateChallengesAsyc(json);
+            List<ContestResponse> response = await cscApi.CreateChallengesAsyc(challengeRequest);
 
-            challengeRequestJson.LogInformation($"Created the Challenges. Saving response to blob");
+            logger.LogInformation($"Created the Challenges. Saving response to blob");
 
             // Uses the tpid as the prefix for the blobs filename
             string blobPrefix = response.First<ContestResponse>().Mstpid;
 
             // Writes the blob to storage
             string jsonString = JsonConvert.SerializeObject(response);
-            string fileName = $"{blobPrefix}{DateTime.Now.ToString(DateFormat)}_{Guid.NewGuid().ToString()}";
+            string fileName = $"{blobPrefix}-{DateTime.Now:yyyy-MM}-{Guid.NewGuid()}";
             await blobApi.UploadToBlobAsync(jsonString, fileName);
 
-            challengeRequestJson.LogInformation($"C# CreateChallenges function processed");
+            logger.LogInformation($"C# CreateChallenges function processed");
         }
 
         #endregion

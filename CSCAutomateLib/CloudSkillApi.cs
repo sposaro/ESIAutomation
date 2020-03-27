@@ -26,9 +26,10 @@ namespace CSCAutomateLib
         private const string ApiPathContests = "/api/contests/";
         private const string ApiMethodLearners = "/learners/";
         private const string MediaTypeJson = "application/json";
-        private const string Https = "https";
         private const string ApiKeyName = "Ocp-Apim-Subscription-Key";
-        private const string ContestNameTag = "| Exam";
+        private const string ContestNameTag = "LearningPath";
+        private const string ContestDateFormat = "MMMM";
+        private const string MsLearnUriPrefix = "https://docs.microsoft.com/";
         #endregion
 
         #region "Constructor"
@@ -51,14 +52,16 @@ namespace CSCAutomateLib
         /// <summary>
         /// CreateChallengesAsync
         /// </summary>
-        /// <param name="challengeRequestJson"></param>
+        /// <param name="request"></param>
         /// <returns></returns>
-        public async Task<List<ContestResponse>> CreateChallengesAsyc(string challengeRequestJson)
+        public async Task<List<ContestResponse>> CreateChallengesAsyc(ChallengeRequest request)
         {
-            ChallengeRequest challengeRequest = ContestFactory.CreateChallengeRequest(challengeRequestJson);
+            if (request == null || request.BaseInputs == null || request.LearningPaths == null)
+                throw new ArgumentNullException("Challenge request does not contain required fields");
+
             List<ContestResponse> contestReponseList = await CreateCollectionChallengesAsync(
-                challengeRequest.LearningPaths,
-                challengeRequest.BaseInputs);
+                request.LearningPaths,
+                request.BaseInputs);
 
             return contestReponseList;
         }
@@ -114,15 +117,20 @@ namespace CSCAutomateLib
         /// <returns>The ContestResponse.</returns>
         public async Task<List<ContestResponse>> CreateCollectionChallengesAsync(IList<LearningPath> learningPaths, ContestRequest request)
         {
+            if (learningPaths == null)
+                throw new ArgumentNullException($"{nameof(learningPaths)} is null");
+
             var results = new List<ContestResponse>();
-            request.Name = $"{request.Name} {ContestNameTag}";
+            request.Name = $"{request.Name} | {DateTime.Now.ToString(ContestDateFormat)} {ContestNameTag}";
 
             foreach (LearningPath lp in learningPaths)
             {
                 request.CollectionUrl = lp.CollectionUrl;
                 request.CollectionName = lp.CollectionName;
-                request.CollectionID = lp.GetCollectionId();
-                if (request.CollectionUrl.ToLower().StartsWith(Https))
+
+                if (!string.IsNullOrWhiteSpace(request.CollectionName) &&
+                    request.CollectionUrl.StartsWith(MsLearnUriPrefix) && 
+                    !string.IsNullOrWhiteSpace(request.CollectionName))
                 {
                     ContestResponse result = await CreateChallengeAsync(request);
                     results.Add(result);
@@ -141,7 +149,7 @@ namespace CSCAutomateLib
         /// <returns>The ContestResponse from the server.</returns>
         private async Task<ContestResponse> CreateChallengeAsync(ContestRequest contest)
         {
-            string uri = string.Concat(apiRoot, ApiPathContests);
+            Uri uri = new Uri ($"{apiRoot}{ApiPathContests}");
             string json = JsonConvert.SerializeObject(contest);
             try
             { 

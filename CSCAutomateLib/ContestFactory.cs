@@ -68,12 +68,9 @@ namespace CSCAutomateLib
         {
             return "{\"contestId\":\"b95e57ea-61d1-4844-935e-7477e05d8f6a\",\"learnerId\":\"SriniAmbati-6212\"}";
         }
-        public static ChallengeRequest CreateChallengeRequest(string jsonChallengeRequest)
-        {
-            var result = JsonConvert.DeserializeObject<ChallengeRequest>(jsonChallengeRequest);
+        public static ChallengeRequest CreateChallengeRequest(string jsonChallengeRequest) =>
+            JsonConvert.DeserializeObject<ChallengeRequest>(jsonChallengeRequest);
 
-            return result;
-        }
         #endregion
     }
 }
