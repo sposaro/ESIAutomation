@@ -55,7 +55,7 @@ namespace CSCAutomateLib
         /// <returns></returns>
         public async Task<List<ContestResponse>> GetAllContestByCustomerId(string tpid)
         {
-            List<BlobItem> blobs = GetBlobItems(tpid);
+            List<BlobItem> blobs = await GetBlobItemsAsync(tpid);
 
             if (blobs.Count == 0)
                 return null;
@@ -82,9 +82,11 @@ namespace CSCAutomateLib
         #endregion
 
         #region "Private Methods"
-        private async Task<T> GetBlobContentsAync<T>(string blobname)
+        public async Task<T> GetBlobContentsAync<T>(string blobname)
         {
+            await containerClient.CreateIfNotExistsAsync();
             BlobClient blobClient = containerClient.GetBlobClient(blobname);
+
             BlobDownloadInfo blobDownload = await blobClient.DownloadAsync();
             T result;
 
@@ -102,8 +104,10 @@ namespace CSCAutomateLib
         /// </summary>
         /// <param name="prefix">The filename prefix. Default retuns all</param>
         /// <returns>Returns all the blob that filename matches the <paramref name="prefix"/></returns>
-        private List<BlobItem> GetBlobItems(string prefix = "")
+        public async Task<List<BlobItem>> GetBlobItemsAsync(string prefix = "")
         {
+            await containerClient.CreateIfNotExistsAsync();
+
             var results = new List<BlobItem>();
 
             // List all blobs in the container

@@ -8,7 +8,6 @@ using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Threading.Tasks;
 
 
@@ -46,32 +45,37 @@ namespace CSCAutomateFunction
         #endregion
 
         #region "Private Methods"
-        private static async Task CreateAndSaveChallengesAsync(string json, ILogger logger)
+        private static async Task<List<ContestResponse>> CreateAndSaveChallengesAsync(string json, ILogger logger)
         {
             logger.LogInformation($"C# CreateChallenges function processing async: {json}");
 
-            ChallengeRequest challengeRequest = ContestFactory.CreateChallengeRequest(json);
+            ChallengeRequest request = ContestFactory.CreateChallengeRequest(json);
 
-            if (challengeRequest == null)
+            if (request == null)
                 throw new ArgumentException("Error parsing challenge request JSON");
+
+            if (string.IsNullOrWhiteSpace(request.BaseInputs.Mstpid))
+                throw new ArgumentNullException($"{nameof(request.BaseInputs.Mstpid)} must be valid");
 
             BlobApi blobApi = await BlobApi.BlobApiInstance;
             CloudSkillApi cscApi = await CloudSkillApi.CloudSkillsApiInstance;
 
-            // Creates the challenges
-            List<ContestResponse> response = await cscApi.CreateChallengesAsyc(challengeRequest);
+            // Set the end date for +1 month
+            DateTime startDate = DateTime.Parse(request.BaseInputs.StartDateStr);
+            request.BaseInputs.EndDateStr = startDate.AddMonths(1).ToString("MM-dd-yyyy HH:mm:ss");
+
+            List<ContestResponse> response = await cscApi.CreateChallengesAsyc(request);
 
             logger.LogInformation($"Created the Challenges. Saving response to blob");
 
-            // Uses the tpid as the prefix for the blobs filename
-            string blobPrefix = response.First<ContestResponse>().Mstpid;
-
             // Writes the blob to storage
             string jsonString = JsonConvert.SerializeObject(response);
-            string fileName = $"{blobPrefix}-{DateTime.Now:yyyy-MM}-{Guid.NewGuid()}";
+            string fileName = $"{request.BaseInputs.Mstpid}-{DateTime.Now:yyyy-MM}-{Guid.NewGuid()}";
             await blobApi.UploadToBlobAsync(jsonString, fileName);
 
             logger.LogInformation($"C# CreateChallenges function processed");
+
+            return response;
         }
 
         #endregion

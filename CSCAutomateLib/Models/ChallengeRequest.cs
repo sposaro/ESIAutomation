@@ -8,6 +8,9 @@ namespace CSCAutomateLib
     {
         public string CollectionName { get; set; }
         public string CollectionUrl { get; set; }
+
+        public string GetCollectionId() =>
+            CollectionUrl.Substring(CollectionUrl.LastIndexOf('/') + 1);
     }
 
     public class ChallengeRequest

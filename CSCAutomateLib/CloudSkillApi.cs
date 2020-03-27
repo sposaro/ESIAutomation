@@ -127,6 +127,7 @@ namespace CSCAutomateLib
             {
                 request.CollectionUrl = lp.CollectionUrl;
                 request.CollectionName = lp.CollectionName;
+                request.CollectionID = lp.GetCollectionId();
 
                 if (!string.IsNullOrWhiteSpace(request.CollectionName) &&
                     request.CollectionUrl.StartsWith(MsLearnUriPrefix) && 
