@@ -48,8 +48,8 @@ namespace CSCAutomateLib
         public string ParticipantType { get; set; }
         public object CollectionID { get; set; }
         public bool ShowModuleCompletionDate { get; set; }
-        public object CollectionName { get; set; }
-        public object CollectionUrl { get; set; }
+        public string CollectionName { get; set; }
+        public string CollectionUrl { get; set; }
         public object StatusCode { get; set; }
         public object Message { get; set; }
         public Errors Errors { get; set; }

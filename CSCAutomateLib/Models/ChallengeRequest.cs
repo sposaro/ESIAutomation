@@ -17,8 +17,7 @@ namespace CSCAutomateLib
 
     public class ChallengeRequest
     {
-        public string SponsorEmail { get; set; }
-        public IList<ContestRequest> BaseInputs { get; set; }
+        public ContestRequest BaseInputs { get; set; }
         public IList<LearningPath> LearningPaths { get; set; }
     }
 }

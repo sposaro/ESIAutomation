@@ -33,12 +33,28 @@ namespace CSCAutomateLib
         #endregion
 
         #region "Public Methods"
+        public async Task<ContestResponse> GetContest(string customerId, string collectionName)
+        {
+            List<ContestResponse> contests = await GetAllContestByCustomerId(customerId);
+
+            if (contests == null)
+                throw new KeyNotFoundException($"CustomerId ({customerId}) not found");
+
+            foreach (ContestResponse contest in contests)
+            {
+                if (contest.CollectionName == collectionName)
+                    return contest;
+            }
+
+            throw new DirectoryNotFoundException($"Collection name ({collectionName}) not found");
+        }
+
         /// <summary>
         /// Gets current contests from Blob Storage
         /// </summary>
         /// <param name="blobApi"></param>
         /// <returns></returns>
-        public async Task<List<ContestResponse>> GetActiveContest(string tpid)
+        public async Task<List<ContestResponse>> GetAllContestByCustomerId(string tpid)
         {
             List<BlobItem> blobs = GetBlobItems(tpid);
 

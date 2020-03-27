@@ -24,34 +24,37 @@ namespace CSCAutomateFunction
                 string tpid = req.Query["customerId"];
 
                 if (string.IsNullOrWhiteSpace(tpid))
-                {
-                    string warningMessage = "Expecting customer number in post body. Recieved empty string.";
-                    log.LogWarning(warningMessage);
-                    return new BadRequestObjectResult(warningMessage);
-                }
+                    throw new ArgumentNullException("Expecting customerId in query param. Recieved empty string.");
 
                 BlobApi blobApi = await BlobApi.BlobApiInstance;
-                List<ContestResponse> activeContests = await blobApi.GetActiveContest(tpid);
+                List<ContestResponse> activeContests = await blobApi.GetAllContestByCustomerId(tpid);
 
                 if (activeContests == null)
-                {
-                    new BadRequestObjectResult($"Customer id ({tpid}) not found.");
-                }
+                    throw new KeyNotFoundException($"Customer Code ({tpid}) not found.");
 
-                StringBuilder builder = new StringBuilder();
-                foreach (ContestResponse contest in activeContests)
-                {
-                    builder.Append($"{contest.CollectionName}, ");
-                }
-                builder.Remove(builder.Length - 2, 2);
+                string response = GetCollectionString(activeContests);
 
-                return new OkObjectResult(builder.ToString());
+                return new OkObjectResult(response);
             }
             catch (Exception ex)
             {
                 log.LogError(string.Format("Error in CreateChallenges: {0}", ex.Message));
-                throw;
+                return new BadRequestObjectResult(ex.Message);
             }
+        }
+        #endregion
+
+        #region Private Methods
+        private static string GetCollectionString(List<ContestResponse> contestList)
+        {
+            StringBuilder builder = new StringBuilder();
+            foreach (ContestResponse contest in contestList)
+            {
+                builder.Append($"{contest.CollectionName}, ");
+            }
+            builder.Remove(builder.Length - 2, 2);
+
+            return builder.ToString();
         }
         #endregion
     }

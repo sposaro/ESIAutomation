@@ -2,7 +2,9 @@
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Diagnostics;
+using System.Net;
 using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
@@ -56,7 +58,7 @@ namespace CSCAutomateLib
             ChallengeRequest challengeRequest = ContestFactory.CreateChallengeRequest(challengeRequestJson);
             List<ContestResponse> contestReponseList = await CreateCollectionChallengesAsync(
                 challengeRequest.LearningPaths,
-                challengeRequest.BaseInputs[0]);
+                challengeRequest.BaseInputs);
 
             return contestReponseList;
         }
@@ -80,13 +82,28 @@ namespace CSCAutomateLib
         /// </summary>
         /// <param name="request">Request Body</param>
         /// <returns>The result from the server.</returns>
-        public async Task<string> AddLearnerAsync(string contestId, string learnerId)
+        public async Task<Learner> AddLearnerAsync(string contestId, string learnerId)
         {
             string uri = string.Concat(apiRoot, ApiPathContests, contestId, ApiMethodLearners, learnerId);
             var response = await httpClient.PostAsync(uri,
                 new StringContent(string.Empty, Encoding.UTF8, MediaTypeJson));
-            string result = await response.Content.ReadAsStringAsync();
-            return result;
+
+            string resultMessage = await response.Content.ReadAsStringAsync();
+            
+            // Not a valid MSLearn ID
+            // Server send a valid message
+            if (response.StatusCode == HttpStatusCode.NotFound)
+                throw new KeyNotFoundException(resultMessage);
+
+            // The is likley a duplicate request
+            if (response.StatusCode == HttpStatusCode.InternalServerError)
+                throw new DuplicateNameException($"The MSLearn Username '{learnerId}' is likely already registerd for this path. {resultMessage}");
+
+            // Unknown issue occured
+            if (!response.IsSuccessStatusCode)
+                throw new HttpRequestException($"An unknown server error as occured. {resultMessage}");
+
+            return JsonConvert.DeserializeObject<Learner>(resultMessage);
         }
 
         /// <summary>
