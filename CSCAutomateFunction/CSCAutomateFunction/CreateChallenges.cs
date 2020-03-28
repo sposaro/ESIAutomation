@@ -75,9 +75,12 @@ namespace CSCAutomateFunction
             List<ContestResponse> response = await cscApi.CreateChallengesAsyc(request);
             logger.LogInformation($"Created the Challenges. Saving response to blob");
 
-            foreach (ContestResponse contest in tuple?.Item1)
+            if (tuple?.Item1 != null)
             {
-                response.Add(contest);
+                foreach (ContestResponse contest in tuple.Item1)
+                {
+                    response.Add(contest);
+                }
             }
 
             await WriteToBlobAsync(request.BaseInputs, response);
