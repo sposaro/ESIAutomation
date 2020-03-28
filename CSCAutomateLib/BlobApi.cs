@@ -1,8 +1,11 @@
 ﻿using Azure.Storage.Blobs;
 using Azure.Storage.Blobs.Models;
+using CSCAutomateLib.Models;
 using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -18,7 +21,7 @@ namespace CSCAutomateLib
         #endregion
 
         #region "Constructor"
-        public static AsyncLazy<BlobApi> BlobApiInstance = new AsyncLazy<BlobApi>(async () =>
+        public static AsyncLazy<BlobApi> Instance = new AsyncLazy<BlobApi>(async () =>
             new BlobApi(await ConfigurationFactory.CreateDevConfigurationAysnc()));
 
         public BlobApi(Configuration config)
@@ -34,7 +37,7 @@ namespace CSCAutomateLib
         #region "Public Methods"
         public async Task<ContestResponse> GetContest(string customerId, string collectionName)
         {
-            List<ContestResponse> contests = await GetAllContestByCustomerId(customerId);
+            IList<ContestResponse> contests = await GetContestResponseAsync(customerId);
 
             if (contests == null)
                 throw new KeyNotFoundException($"CustomerId ({customerId}) not found");
@@ -48,22 +51,30 @@ namespace CSCAutomateLib
             throw new DirectoryNotFoundException($"Collection name ({collectionName}) not found");
         }
 
+        public async Task DeleteBlobAsync(string blobName)
+        {
+            await containerClient.DeleteBlobIfExistsAsync(blobName);
+        }
+
+        public async Task<IList<ContestResponse>> GetContestResponseAsync(string tpid)
+            => (await GetAllContestTupleAsync(tpid)).Item1;
+
         /// <summary>
         /// Gets current contests from Blob Storage
         /// </summary>
         /// <param name="blobApi"></param>
         /// <returns></returns>
-        public async Task<List<ContestResponse>> GetAllContestByCustomerId(string tpid)
+        public async Task<Tuple<IList<ContestResponse>,string>> GetAllContestTupleAsync(string tpid)
         {
-            List<BlobItem> blobs = await GetBlobItemsAsync(tpid);
+            IList<BlobItem> blobs = await GetBlobItemsAsync(tpid);
 
             if (blobs.Count == 0)
                 return null;
 
-            //TODO: Falsely assuming one active blob per TPID
             string blobName = blobs[0].Name;
+            BlobContents contents = await GetBlobContentsAync<BlobContents>(blobName);
 
-            return await GetBlobContentsAync<List<ContestResponse>>(blobName);
+            return new Tuple<IList<ContestResponse>, string>(contents.Contests, blobName);
         }
 
         public async Task UploadToBlobAsync(string json, string blobName)
@@ -82,7 +93,7 @@ namespace CSCAutomateLib
         #endregion
 
         #region "Private Methods"
-        public async Task<T> GetBlobContentsAync<T>(string blobname)
+        private async Task<T> GetBlobContentsAync<T>(string blobname)
         {
             await containerClient.CreateIfNotExistsAsync();
             BlobClient blobClient = containerClient.GetBlobClient(blobname);
@@ -104,7 +115,7 @@ namespace CSCAutomateLib
         /// </summary>
         /// <param name="prefix">The filename prefix. Default retuns all</param>
         /// <returns>Returns all the blob that filename matches the <paramref name="prefix"/></returns>
-        public async Task<List<BlobItem>> GetBlobItemsAsync(string prefix = "")
+        private async Task<IList<BlobItem>> GetBlobItemsAsync(string prefix = "")
         {
             await containerClient.CreateIfNotExistsAsync();
 

@@ -6,7 +6,6 @@ using Microsoft.Azure.WebJobs.Extensions.Http;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
 
@@ -45,8 +44,8 @@ namespace CSCAutomateFunction
             if (string.IsNullOrWhiteSpace(learnerRequestJson))
                 throw new ArgumentException("Expecting JSON post body. Recieved empty string.");
 
-            CloudSkillApi cscApi = await CloudSkillApi.CloudSkillsApiInstance;
-            BlobApi blobApi = await BlobApi.BlobApiInstance;
+            CloudSkillApi cscApi = await CloudSkillApi.Instance;
+            BlobApi blobApi = await BlobApi.Instance;
             LearnerRequest request = JsonConvert.DeserializeObject<LearnerRequest>(learnerRequestJson);
 
             // Error checking for blank values

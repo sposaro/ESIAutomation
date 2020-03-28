@@ -33,7 +33,7 @@ namespace CSCAutomateLib
         #endregion
 
         #region "Constructor"
-        public static AsyncLazy<CloudSkillApi> CloudSkillsApiInstance = new AsyncLazy<CloudSkillApi>(async () =>
+        public static AsyncLazy<CloudSkillApi> Instance = new AsyncLazy<CloudSkillApi>(async () =>
             new CloudSkillApi(await ConfigurationFactory.CreateDevConfigurationAysnc()));
 
         public CloudSkillApi(Configuration config)
@@ -108,14 +108,16 @@ namespace CSCAutomateLib
 
             return JsonConvert.DeserializeObject<Learner>(resultMessage);
         }
+        #endregion
 
+        #region "Private Methods"
         /// <summary>
         /// Creates a challenge for each collection based on template
         /// </summary>
         /// <param name="learningPaths">The list of collections to be used in the template.</param>
         /// <param name="request">The template to be used to created the contest.</param>
         /// <returns>The ContestResponse.</returns>
-        public async Task<List<ContestResponse>> CreateCollectionChallengesAsync(IList<LearningPath> learningPaths, ContestRequest request)
+        private async Task<List<ContestResponse>> CreateCollectionChallengesAsync(IList<LearningPath> learningPaths, ContestRequest request)
         {
             if (learningPaths == null)
                 throw new ArgumentNullException($"{nameof(learningPaths)} is null");
@@ -130,7 +132,7 @@ namespace CSCAutomateLib
                 request.CollectionID = lp.GetCollectionId();
 
                 if (!string.IsNullOrWhiteSpace(request.CollectionName) &&
-                    request.CollectionUrl.StartsWith(MsLearnUriPrefix) && 
+                    request.CollectionUrl.StartsWith(MsLearnUriPrefix) &&
                     !string.IsNullOrWhiteSpace(request.CollectionName))
                 {
                     ContestResponse result = await CreateChallengeAsync(request);
@@ -140,9 +142,7 @@ namespace CSCAutomateLib
 
             return results;
         }
-        #endregion
 
-        #region "Private Methods"        
         /// <summary>
         /// Creates a Cloud Skills Challenge based on the parameter.
         /// </summary>

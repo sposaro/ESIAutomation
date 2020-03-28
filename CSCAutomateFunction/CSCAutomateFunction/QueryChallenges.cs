@@ -26,8 +26,8 @@ namespace CSCAutomateFunction
                 if (string.IsNullOrWhiteSpace(tpid))
                     throw new ArgumentNullException("Expecting customerId in query param. Recieved empty string.");
 
-                BlobApi blobApi = await BlobApi.BlobApiInstance;
-                List<ContestResponse> activeContests = await blobApi.GetAllContestByCustomerId(tpid);
+                BlobApi blobApi = await BlobApi.Instance;
+                IList<ContestResponse> activeContests = await blobApi.GetContestResponseAsync(tpid);
 
                 if (activeContests == null)
                     throw new KeyNotFoundException($"Customer Code ({tpid}) not found.");
@@ -45,7 +45,7 @@ namespace CSCAutomateFunction
         #endregion
 
         #region Private Methods
-        private static string GetCollectionString(List<ContestResponse> contestList)
+        private static string GetCollectionString(IList<ContestResponse> contestList)
         {
             StringBuilder builder = new StringBuilder();
             foreach (ContestResponse contest in contestList)
