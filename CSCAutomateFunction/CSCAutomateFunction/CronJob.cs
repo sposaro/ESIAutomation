@@ -14,14 +14,14 @@
 //        public static async Task Run([TimerTrigger("0 */5 * * * *")]TimerInfo myTimer, ILogger log)
 //        {
 //            // Get all blob names
-//            BlobApi blobApi = await BlobApi.BlobApiInstance;
-//            List<BlobItem> blobs = await blobApi.GetBlobItemsAsync();
+//            BlobApi blobApi = await BlobApi.Instance;
+//            Tuple<IList<ContestResponse>, string> tuple = await blobApi.GetAllContestTupleAsync(string.Empty);
 
-//            foreach (BlobItem blob in blobs)
+//            foreach (BlobItem blob in tuple)
 //            {
 //                var contests = await blobApi.GetBlobContentsAync<List<ContestResponse>>(blob.Name);
 
-//                foreach(ContestResponse contest in contests)
+//                foreach (ContestResponse contest in contests)
 //                {
 //                    // if in past
 //                    DateTime endDate = DateTime.Parse(contest.EndDateStr);
@@ -31,7 +31,6 @@
 //                        // create new
 //                        // delete
 //                    }
-
 //                }
 //            }
 //        }

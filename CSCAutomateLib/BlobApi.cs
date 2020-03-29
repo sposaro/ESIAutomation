@@ -37,6 +37,11 @@ namespace CSCAutomateLib
         #region "Public Methods"
         public async Task<ContestResponse> GetContest(string customerId, string collectionName)
         {
+            if (string.IsNullOrWhiteSpace(customerId))
+                throw new ArgumentNullException($"{nameof(customerId)} is blank");
+            else if (string.IsNullOrWhiteSpace(collectionName))
+                throw new ArgumentNullException($"{nameof(collectionName)} is blank");
+
             IList<ContestResponse> contests = await GetContestResponseAsync(customerId);
 
             if (contests == null)
@@ -44,11 +49,11 @@ namespace CSCAutomateLib
 
             foreach (ContestResponse contest in contests)
             {
-                if (contest.CollectionName == collectionName)
+                if (contest.CollectionName.ToLower() == collectionName.ToLower())
                     return contest;
             }
 
-            throw new DirectoryNotFoundException($"Collection name ({collectionName}) not found");
+            throw new DirectoryNotFoundException($"Learning Path ({collectionName}) not found");
         }
 
         public async Task DeleteBlobAsync(string blobName)
@@ -60,9 +65,9 @@ namespace CSCAutomateLib
             => (await GetAllContestTupleAsync(tpid)).Item1;
 
         /// <summary>
-        /// Gets current contests from Blob Storage
+        /// Gets all the contest.
         /// </summary>
-        /// <param name="blobApi"></param>
+        /// <param name="tpid">If blank, return all contests</param>
         /// <returns></returns>
         public async Task<Tuple<IList<ContestResponse>,string>> GetAllContestTupleAsync(string tpid)
         {

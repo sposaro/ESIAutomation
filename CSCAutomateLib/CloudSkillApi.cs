@@ -67,17 +67,27 @@ namespace CSCAutomateLib
         }
 
         /// <summary>
-        /// Makes get call to fetch contest.
+        /// Return the progress precentage of the user
         /// </summary>
-        /// <param name="contestId">The id of the contest to fetch</param>
-        /// <returns>The contest response if value. Throw exception otherwise</returns>
-        public async Task<ContestResponse> GetContestStatus(string contestId)
+        /// <param name="contestId">The contestId</param>
+        /// <param name="userName">The mslearnid</param>
+        /// <returns>T
+        ///     The progress percentage of the learning path the user completed.
+        ///     -1 if the user was not found in the learning path.
+        /// </returns>
+        public async Task<int> GetUserProgressAsync(string contestId, string userName)
         {
-            string uri = string.Concat(apiRoot, ApiPathContests, contestId);
-            var response = await httpClient.GetAsync(uri);
-            string jsonResponse = await response.Content.ReadAsStringAsync();
-            ContestResponse result = JsonConvert.DeserializeObject<ContestResponse>(jsonResponse);
-            return result;
+            ContestResponse currentContest = await GetContestAsync(contestId);
+
+            foreach (Learner learner in currentContest.Learners)
+            {
+                if (learner.UserName.ToLower() == userName.ToLower())
+                {
+                    return int.Parse(learner.ProgressPercentage);
+                }
+            }
+
+            return -1;
         }
 
         /// <summary>
@@ -87,6 +97,11 @@ namespace CSCAutomateLib
         /// <returns>The result from the server.</returns>
         public async Task<Learner> AddLearnerAsync(string contestId, string learnerId)
         {
+            if (string.IsNullOrWhiteSpace(contestId))
+                throw new ArgumentNullException($"{nameof(contestId)} is blank.");
+            else if (string.IsNullOrWhiteSpace(learnerId))
+                throw new ArgumentNullException($"{nameof(learnerId)} is blank.");
+
             string uri = string.Concat(apiRoot, ApiPathContests, contestId, ApiMethodLearners, learnerId);
             var response = await httpClient.PostAsync(uri,
                 new StringContent(string.Empty, Encoding.UTF8, MediaTypeJson));
@@ -111,6 +126,27 @@ namespace CSCAutomateLib
         #endregion
 
         #region "Private Methods"
+        /// <summary>
+        /// Makes get call to fetch contest.
+        /// </summary>
+        /// <param name="contestId">The id of the contest to fetch</param>
+        /// <returns>The contest response if value. Throw exception otherwise</returns>
+        private async Task<ContestResponse> GetContestAsync(string contestId)
+        {
+            if (string.IsNullOrWhiteSpace(contestId))
+                throw new ArgumentNullException($"{nameof(contestId)} is blank");
+
+            string uri = string.Concat(apiRoot, ApiPathContests, contestId);
+            HttpResponseMessage response = await httpClient.GetAsync(uri);
+
+            if (!response.IsSuccessStatusCode)
+                throw new HttpRequestException("Failed http request");
+
+            string jsonResponse = await response.Content.ReadAsStringAsync();
+            ContestResponse result = JsonConvert.DeserializeObject<ContestResponse>(jsonResponse);
+            return result;
+        }
+
         /// <summary>
         /// Creates a challenge for each collection based on template
         /// </summary>
