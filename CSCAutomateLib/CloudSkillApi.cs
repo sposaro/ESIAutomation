@@ -1,5 +1,4 @@
-﻿using Azure.Storage.Blobs.Models;
-using Newtonsoft.Json;
+﻿using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -29,7 +28,7 @@ namespace CSCAutomateLib
         private const string ApiKeyName = "Ocp-Apim-Subscription-Key";
         private const string ContestNameTag = "LearningPath";
         private const string ContestDateFormat = "MMMM";
-        private const string MsLearnUriPrefix = "https://docs.microsoft.com/";
+        private const string CollectionUriPrefix = "https://docs.microsoft.com/en-us/users";
         #endregion
 
         #region "Constructor"
@@ -75,7 +74,7 @@ namespace CSCAutomateLib
         ///     The progress percentage of the learning path the user completed.
         ///     -1 if the user was not found in the learning path.
         /// </returns>
-        public async Task<int> GetUserProgressAsync(string contestId, string userName)
+        public async Task<Learner> GetLearner(string contestId, string userName)
         {
             ContestResponse currentContest = await GetContestAsync(contestId);
 
@@ -83,11 +82,11 @@ namespace CSCAutomateLib
             {
                 if (learner.UserName.ToLower() == userName.ToLower())
                 {
-                    return int.Parse(learner.ProgressPercentage);
+                    return learner;
                 }
             }
 
-            return -1;
+            return null;
         }
 
         /// <summary>
@@ -136,7 +135,7 @@ namespace CSCAutomateLib
             if (string.IsNullOrWhiteSpace(contestId))
                 throw new ArgumentNullException($"{nameof(contestId)} is blank");
 
-            string uri = string.Concat(apiRoot, ApiPathContests, contestId);
+            Uri uri = new Uri($"{apiRoot}{ApiPathContests}{contestId}");
             HttpResponseMessage response = await httpClient.GetAsync(uri);
 
             if (!response.IsSuccessStatusCode)
@@ -168,7 +167,7 @@ namespace CSCAutomateLib
                 request.CollectionID = lp.GetCollectionId();
 
                 if (!string.IsNullOrWhiteSpace(request.CollectionName) &&
-                    request.CollectionUrl.StartsWith(MsLearnUriPrefix) &&
+                    request.CollectionUrl.StartsWith(CollectionUriPrefix) &&
                     !string.IsNullOrWhiteSpace(request.CollectionName))
                 {
                     ContestResponse result = await CreateChallengeAsync(request);

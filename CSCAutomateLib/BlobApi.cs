@@ -74,7 +74,7 @@ namespace CSCAutomateLib
             IList<BlobItem> blobs = await GetBlobItemsAsync(tpid);
 
             if (blobs.Count == 0)
-                return null;
+                throw new KeyNotFoundException($"Customer Code {tpid} was not found.");
 
             string blobName = blobs[0].Name;
             BlobContents contents = await GetBlobContentsAync<BlobContents>(blobName);
