@@ -50,10 +50,8 @@ namespace CSCAutomateFunction
             StringBuilder builder = new StringBuilder();
             foreach (ContestResponse contest in contestList)
             {
-                builder.Append($"{contest.CollectionName}, ");
+                builder.AppendLine($"{contest.CollectionName}({contest.CollectionUrl})");
             }
-            builder.Remove(builder.Length - 2, 2);
-
             return builder.ToString();
         }
         #endregion

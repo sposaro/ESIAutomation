@@ -54,20 +54,29 @@ namespace CSCAutomateFunction
 
             BlobApi blobApi = await BlobApi.Instance;
             CloudSkillApi cscApi = await CloudSkillApi.Instance;
+            IList<ContestResponse> currentContests = null;
 
-            Tuple<IList<ContestResponse>,string> tuple = await blobApi.GetAllContestTupleAsync(request.BaseInputs.Mstpid);
-            if (tuple?.Item1 != null)
+            try
             {
-                request.LearningPaths = RemoveDuplicateLearningPaths(request, tuple.Item1);
-                await blobApi.DeleteBlobAsync(tuple.Item2);
+                Tuple<IList<ContestResponse>,string> tuple = await blobApi.GetAllContestTupleAsync(request.BaseInputs.Mstpid);
+                if (tuple?.Item1 != null)
+                {
+                    currentContests = tuple.Item1;
+                    request.LearningPaths = RemoveDuplicateLearningPaths(request, tuple.Item1);
+                    await blobApi.DeleteBlobAsync(tuple.Item2);
+                }
+            }
+            catch(KeyNotFoundException e)
+            {
+                logger.LogInformation($"New challenge request for {request.BaseInputs.Mstpid}");
             }
 
             List<ContestResponse> response = await cscApi.CreateChallengesAsyc(request);
             logger.LogInformation($"Created the Challenges. Saving response to blob");
 
-            if (tuple?.Item1 != null)
+            if (currentContests != null)
             {
-                foreach (ContestResponse contest in tuple.Item1)
+                foreach (ContestResponse contest in currentContests)
                 {
                     response.Add(contest);
                 }
