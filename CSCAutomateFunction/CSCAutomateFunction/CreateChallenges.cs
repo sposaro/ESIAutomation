@@ -52,18 +52,8 @@ namespace CSCAutomateFunction
 
             ChallengeRequest request = ContestFactory.CreateChallengeRequest(json);
 
-            if (request == null)
-                throw new ArgumentException("Error parsing challenge request JSON");
-
-            if (string.IsNullOrWhiteSpace(request.BaseInputs.Mstpid))
-                throw new ArgumentNullException($"{nameof(request.BaseInputs.Mstpid)} must be valid");
-
             BlobApi blobApi = await BlobApi.Instance;
             CloudSkillApi cscApi = await CloudSkillApi.Instance;
-
-            // Set the end date for +1 month
-            DateTime startDate = DateTime.Parse(request.BaseInputs.StartDateStr);
-            request.BaseInputs.EndDateStr = startDate.AddMonths(1).ToString("MM-dd-yyyy HH:mm:ss");
 
             Tuple<IList<ContestResponse>,string> tuple = await blobApi.GetAllContestTupleAsync(request.BaseInputs.Mstpid);
             if (tuple?.Item1 != null)

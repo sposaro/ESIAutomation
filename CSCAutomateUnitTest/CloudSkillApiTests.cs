@@ -14,11 +14,11 @@ namespace CSCAutomateLib.Tests
         public async Task CreateChallengesAsycTestAsync()
         {
             Configuration config = await TestHelper.GetConfigurationAsync();
-            BlobApi blobApi = new BlobApi(config);
             CloudSkillApi cscApi = new CloudSkillApi(config);
 
-            string challengeRequestJson = ContestFactory.CreateChallengeRequestJson();
-            List<ContestResponse> contestReponseList = await cscApi.CreateChallengesAsync(blobApi, challengeRequestJson);
+            string json = ContestFactory.CreateChallengeRequestJson();
+            ChallengeRequest request = ContestFactory.CreateChallengeRequest(json);
+            List<ContestResponse> contestReponseList = await cscApi.CreateChallengesAsyc(request);
 
             Assert.IsTrue(contestReponseList.Count > 0);
         }
@@ -29,10 +29,10 @@ namespace CSCAutomateLib.Tests
             Configuration config = await TestHelper.GetConfigurationAsync();
             CloudSkillApi cscApi = new CloudSkillApi(config);
 
-            string learnerRequestJson = ContestFactory.CreateLearnerRequestJson();
-            string learnerReponse = await cscApi.AddLearnerAsync(learnerRequestJson);
+            //string learnerRequestJson = ContestFactory.CreateLearnerRequestJson();
+            Learner response = await cscApi.AddLearnerAsync("b95e57ea-61d1-4844-935e-7477e05d8f6a", "SriniAmbati-6212");
 
-            Assert.IsTrue(learnerReponse.Length > 0);
+            Assert.IsNotNull(response);
         }
         #endregion
     }
