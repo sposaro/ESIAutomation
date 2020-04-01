@@ -32,7 +32,7 @@ namespace CSCAutomateFunction
                 if (activeContests == null)
                     throw new KeyNotFoundException($"Customer Code ({tpid}) not found.");
 
-                string response = GetCollectionString(activeContests);
+                string response = activeContests.GetCollectionString();
 
                 return new OkObjectResult(response);
             }
@@ -44,16 +44,15 @@ namespace CSCAutomateFunction
         }
         #endregion
 
-        #region Private Methods
-        private static string GetCollectionString(IList<ContestResponse> contestList)
+        public static string GetCollectionString(this IList<ContestResponse> contestList)
         {
             StringBuilder builder = new StringBuilder();
             foreach (ContestResponse contest in contestList)
             {
-                builder.AppendLine($"{contest.CollectionName}({contest.CollectionUrl})");
+                builder.AppendLine($"  {contest.CollectionName}  ");
+                builder.AppendLine($"  ({contest.CollectionUrl})  \n  ");
             }
             return builder.ToString();
         }
-        #endregion
     }
 }

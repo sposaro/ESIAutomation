@@ -6,7 +6,6 @@ using Microsoft.Azure.WebJobs.Extensions.Http;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using CSCAutomateLib;
-using System.Collections.Generic;
 
 namespace CSCAutomateFunction
 {
@@ -17,7 +16,7 @@ namespace CSCAutomateFunction
             [HttpTrigger(AuthorizationLevel.Function, "get", Route = null)] HttpRequest req,
             ILogger log)
         {
-            log.LogInformation("C# HTTP trigger function processed a request.");
+            log.LogInformation("C# HTTP trigger GetLearnerProgress function processed a request.");
 
             try
             {
@@ -43,16 +42,16 @@ namespace CSCAutomateFunction
 
                 CloudSkillApi cloudSkillApi = await CloudSkillApi.Instance;
                 Learner learner = await cloudSkillApi.GetLearner(contestId, userName);
-
+                
                 if (learner == null)
-                    throw new KeyNotFoundException($"Could not find the learner ({userName}) in this contest.");
+                {
+                    return new OkObjectResult(-1);
+                }
 
-                if (learner.ProgressPercentage == null)
-                    throw new NullReferenceException($"The progress for this learner is null.");
+                if (learner.PercentComplete == null)
+                    throw new NullReferenceException($"Unable to determine percent complete.");
 
-                int progress = int.Parse(learner.ProgressPercentage);
-
-                return new OkObjectResult(progress);
+                return new OkObjectResult(learner.PercentComplete);
             }
             catch (Exception ex)
             {

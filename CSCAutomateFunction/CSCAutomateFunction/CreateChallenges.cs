@@ -33,9 +33,10 @@ namespace CSCAutomateFunction
                     return new BadRequestObjectResult(warningMessage);
                 }
 
-                await CreateAndSaveChallengesAsync(requestBody, log);
+                IList<ContestResponse> contests = await CreateAndSaveChallengesAsync(requestBody, log);
+                string returnValue = contests.GetCollectionString();
 
-                return new OkObjectResult(requestBody);
+                return new OkObjectResult(returnValue);
             }
             catch (Exception ex)
             {
@@ -68,7 +69,7 @@ namespace CSCAutomateFunction
             }
             catch(KeyNotFoundException e)
             {
-                logger.LogInformation($"New challenge request for {request.BaseInputs.Mstpid}");
+                logger.LogInformation($"New challenge request for {request.BaseInputs.Mstpid}. {e}");
             }
 
             List<ContestResponse> response = await cscApi.CreateChallengesAsyc(request);
