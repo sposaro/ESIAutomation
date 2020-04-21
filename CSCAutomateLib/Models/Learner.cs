@@ -26,6 +26,7 @@ namespace CSCAutomateLib
         public DateTime CreatedOn { get; set; }
         public DateTime LastModifiedOn { get; set; }
         public DateTime? LastProgressUpdateOn { get; set; }
+        public DateTime? NextUpdateOn { get; set; }
         public int? Level { get; set; }
         public int? Points { get; set; }
     }

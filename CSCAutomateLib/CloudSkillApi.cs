@@ -77,11 +77,12 @@ namespace CSCAutomateLib
         public async Task<Learner> GetLearner(string contestId, string userName)
         {
             ContestResponse currentContest = await GetContestAsync(contestId);
-
+            
             foreach (Learner learner in currentContest.Learners)
             {
                 if (learner.UserName.ToLower() == userName.ToLower())
                 {
+                    learner.NextUpdateOn = $"{currentContest.NextProgressUpdateOn}({currentContest.TimeZone})";
                     return learner;
                 }
             }
