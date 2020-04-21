@@ -78,9 +78,9 @@ namespace CSCAutomateLib
             if (string.IsNullOrWhiteSpace(request.BaseInputs.Mstpid))
                 throw new ArgumentNullException($"{nameof(request.BaseInputs.Mstpid)} must be valid");
 
-            // Set the end date for +1 month
+            // Extend End Date
             DateTime startDate = DateTime.Parse(request.BaseInputs.StartDateStr);
-            request.BaseInputs.EndDateStr = startDate.AddMonths(1).ToString("MM-dd-yyyy HH:mm:ss");
+            request.BaseInputs.EndDateStr = startDate.AddMonths(6).ToString("MM-dd-yyyy HH:mm:ss");
 
             return request;
         }

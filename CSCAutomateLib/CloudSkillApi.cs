@@ -89,6 +89,12 @@ namespace CSCAutomateLib
             return null;
         }
 
+        public async Task<String> GetCollectionNameAsync(string contestId)
+        {
+            ContestResponse currentContest = await GetContestAsync(contestId);
+            return currentContest.CollectionName;
+        }
+
         /// <summary>
         /// This method adds a learner to a contest.
         /// </summary>
